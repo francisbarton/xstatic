@@ -30,7 +30,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' statx_slurp(
 #' areas_list = "",
 #' dataset_name = "^Carers",
