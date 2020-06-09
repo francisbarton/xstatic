@@ -31,6 +31,7 @@ Data frame
 statx_slurp
 }
 \examples{
+\donttest{
 statx_slurp(
 areas_list = "",
 dataset_name = "^Carers",
@@ -41,4 +42,5 @@ periods_tail = 2,
 batch_size = 1000,
 use_alias = TRUE,
 chatty = TRUE)
+}
 }
