@@ -1,11 +1,33 @@
 Package: xstatic
 Type: Package
 Title: Builds Queries And Retrieves Data From DWP Stat-Xplore
-Version: 0.1.0
+Version: 0.2.0
 Author: Francis Barton
 Maintainer: Francis Barton <fbarton@alwaysdata.net>
 Description: Relatively user-friendly approach to formulating queries to the Stat-Xplore API,
     and handling the response.
+URL: https://github.com/francisbarton/xstatic
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.0
+Imports: 
+    dplyr,
+    dwpstat,
+    here,
+    httr,
+    janitor,
+    jsonlite,
+    purrr,
+    readr,
+    snakecase,
+    stringr,
+    assertthat,
+    usethis,
+    magrittr,
+    rlang,
+    tibble
+Depends: 
+    R (>= 2.10)
+Remotes:
+    dr-uk/dwpstat

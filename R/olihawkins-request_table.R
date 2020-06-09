@@ -1,9 +1,9 @@
 # from olihawkins/statxplorer
 
-library(httr)
-library(jsonlite)
-library(statxplorer)
-library(stringr)
+# library(httr)
+# library(jsonlite)
+# library(statxplorer)
+# library(stringr)
 
 request_table <- function(query) {
 
@@ -32,10 +32,10 @@ request_table <- function(query) {
 
   # If the server returned an error raise it with the response text
   if (response$status_code != 200) {
-    stop(stringr::str_glue(
+    stop(str_glue(
       "The server responded with the error message: {response_text}"))
   }
 
   # Process the JSON, and return
-  jsonlite::fromJSON(response_text, simplifyVector = FALSE)
+  fromJSON(response_text, simplifyVector = FALSE)
 }

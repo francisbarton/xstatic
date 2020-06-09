@@ -1,13 +1,3 @@
-library(assertthat)
-library(dplyr)
-library(dwpstat)
-library(jsonlite)
-library(purrr)
-library(stringr)
-library(usethis)
-
-
-
 get_dwp_codes <- function(
   ben = "",
   ds = "",
@@ -20,22 +10,22 @@ get_dwp_codes <- function(
   chatty = TRUE) {
 
   # store a list of all datasets available from the StatX API
-  bens_list <- dwp_schema() %>%
+  bens_list <- dwpstat::dwp_schema() %>%
     pull(label)
 
   # try to match ben to a full dataset name
   ben <- str_subset(string = bens_list, pattern = ben)
 
-  assert_that(is.string(ben), msg = "A single dataset name was not matched.")
+  assert_that(is.character(ben), msg = "A single dataset name was not matched.")
 
   if(chatty) {
-    usethis::ui_info(paste0("Dataset is: ", ben))
+    ui_info(paste0("Dataset is: ", ben))
   }
 
   # get folder id code
   folder <- sx_get_folder(ben)
   if(chatty) {
-    usethis::ui_info(paste0("Folder name is: ", folder))
+    ui_info(paste0("Folder name is: ", folder))
   }
 
   default <- "default "
@@ -70,55 +60,55 @@ get_dwp_codes <- function(
   # get chatty - show other options as well as the default
   db_options <- sx_pull_col("label", folder)
   if(chatty) {
-    usethis::ui_info(paste0("Choosing ", default, "option: ", ds))
-    usethis::ui_info(paste0("All options:\n\t", str_c(paste0(1:length(db_options), ": ", db_options), collapse = "\n\t")))
-    usethis::ui_info(paste0("Data subset name is: ", db_options[ds]))
+    ui_info(paste0("Choosing ", default, "option: ds=", ds))
+    ui_info(paste0("All options:\n\t", str_c(paste0(1:length(db_options), ": ", db_options), collapse = "\n\t")))
+    ui_info(paste0("Data subset name is: ", db_options[ds]))
   }
 
   # report the options that are being used - for reference
   db_id <- sx_pull_id(ds, folder)
   if(chatty) {
-    usethis::ui_info(paste0("Data subset id is: ", db_id))
+    ui_info(paste0("Data subset id is: ", db_id))
   }
 
-  usethis::ui_info(paste0("Available measures:\n\t", str_c(sx_pull_col("label", db_id), collapse = "\n\t")))
+  ui_info(paste0("Available measures:\n\t", str_c(sx_pull_col("label", db_id), collapse = "\n\t")))
 
   # what numbers are going to be retrieved
-  count_id <- dwp_schema(db_id) %>%
+  count_id <- dwpstat::dwp_schema(db_id) %>%
     filter(type == "COUNT") %>%
     pull(id)
   if(chatty) {
-    usethis::ui_info(paste("Count id is:", count_id))
+    ui_info(paste("Count id is:", count_id))
   }
 
   # period info: month or quarter and how many
   period_id <- sx_pull_id(period, db_id)
   if(chatty) {
-    usethis::ui_info(paste("Period id is:", period_id))
+    ui_info(paste("Period id is:", period_id))
   }
   periods <- sx_get_periods(period_id, tail = periods_tail, head = periods_head)
   if(chatty) {
-    usethis::ui_info(paste("Latest period code:", tail(periods, 1)))
+    ui_info(paste("Latest period code:", tail(periods, 1)))
   }
 
   # geography info: check these look right for your query
   geo_type_id <- sx_pull_id(geo_type, db_id)
   if(chatty) {
-    usethis::ui_info(paste("Geography type id is:", geo_type_id))
+    ui_info(paste("Geography type id is:", geo_type_id))
   }
   geo_field_id <- sx_pull_id(geo_field, geo_type_id)
   if(chatty) {
-    usethis::ui_info(paste("Geography field id is:", geo_field_id))
+    ui_info(paste("Geography field id is:", geo_field_id))
   }
 
   geo_level_id <- sx_pull_id(geo_level, geo_field_id)
-  geo_level_label <- dwp_schema(geo_field_id) %>%
+  geo_level_label <- dwpstat::dwp_schema(geo_field_id) %>%
       slice(geo_level) %>%
       pull(label)
 
   if(chatty) {
-    usethis::ui_info(paste("Geography level id is:", geo_level_id))
-    usethis::ui_info(paste("Geography level is:", geo_level_label))
+    ui_info(paste("Geography level id is:", geo_level_id))
+    ui_info(paste("Geography level is:", geo_level_label))
   }
 
   # export list (info needed for construction of JSON API query)
@@ -129,7 +119,7 @@ list(db_id = db_id, count_id = count_id, period_id = period_id, periods = period
 
 # helper functions used in the above --------------------------------------
 
-# these are all efectively wrappers around Evan Odell's `dwp_schema`
+# these are all effectively wrappers around Evan Odell's `dwp_schema`
 # this is all quite messy
 # I've tried to make these as efficient as I can and remove duplication
 
@@ -137,38 +127,28 @@ list(db_id = db_id, count_id = count_id, period_id = period_id, periods = period
 # used within the other functions below (do not return useful info per se)
 
 sx_pull_id <- function(slice, ...) {
-  dwp_schema(...) %>%
+  dwpstat::dwp_schema(...) %>%
     slice(slice) %>%
     pull(id)
 }
 sx_pull_col <- function(col, ...) {
-  dwp_schema(...) %>%
+  dwpstat::dwp_schema(...) %>%
     pull(col)
 }
 
-
-#
 sx_get_folder <- function(nm) {
-  dwp_schema() %>%
+  dwpstat::dwp_schema() %>%
     filter(label == nm) %>%
     pull(id)
 }
-sx_get_measure <- function(id, type = "VALUESET") {
-  sx_get_db(nm = nm, db = db) %>%
-    sx_pull_id(slice = ms)
-}
-sx_get_geog <- function(nm, db = 1, ms, type, level) {
-  sx_get_measure(nm = nm, db = db, ms = ms) %>%
-    sx_pull_id(slice = type) %>%
-    sx_pull_id(slice = level)
-}
+
 sx_get_periods <- function(id, type = "VALUESET", ms = 1, tail = 1, head = "") {
 
   # if periods_head not specified then set it to same as periods_tail
   # so it has no effect
   if (head == "") { head <- tail }
 
-  dwp_schema(id) %>%
+  dwpstat::dwp_schema(id) %>%
     filter(type == type) %>%
     pull(id) %>%
     sx_pull_col(col = "id") %>%

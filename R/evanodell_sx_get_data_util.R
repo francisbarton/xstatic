@@ -1,10 +1,8 @@
 
 # from dwpstat package by Evan Odell
 
-library(dwpstat)
-library(httr)
-library(jsonlite)
-
+# library(httr)
+# library(jsonlite)
 
 table_endpoint <- "https://stat-xplore.dwp.gov.uk/webapi/rest/v1/table"
 

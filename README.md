@@ -2,6 +2,7 @@
 # xstatic
 
 <!-- badges: start -->
+[![Travis build status](https://travis-ci.com/francisbarton/xstatic.svg?branch=master)](https://travis-ci.com/francisbarton/xstatic)
 <!-- badges: end -->
 
 The goal of `xstatic` is to make the user happy.
@@ -18,24 +19,28 @@ I'm usually only interested in getting data for certain benefits at geographic a
 So this gives me the ability to do that, within its limitations.
 
 Tips of the my proverbial hat to
-[Evan Odell](https://github.com/dr-uk/dwpstat),
-[Oli Hawkins](https://github.com/olihawkins/statxplorer) and
-[David Millson](https://github.com/davidmillson/stat-xplore-R)
+
+* [Evan Odell](https://github.com/dr-uk/dwpstat),
+* [Oli Hawkins](https://github.com/olihawkins/statxplorer) and
+* [David Millson](https://github.com/davidmillson/stat-xplore-R)
+
 for their prior work on this issue.
-There may be others with similar work I haven't found yet.
+There may be others with similar work I'm not yet aware of.
 
-This package relies at its core on Evan's `dwp_schema` and `sx_get_data_util` functions, and in many senses should be thought of as a wrapper for his work with additional bells and whistles.
+This package relies at its core on Evan's `dwp_schema` and `sx_get_data_util` functions, and in a sense should be thought of as a wrapper for his work with additional bells and whistles.
 
-The package also contains an optional usage of one of DR Kane's [Great Britain geographic lookup tables](https://github.com/drkane/geo-lookups/) - very useful to have all that in one file!
-But you can in theory feed your own alternative lookup to the script, either as a URL that sends a CSV or JSON return or as a local file (actually I still need to check that those bits work ok).
+The package also provides, and by default uses, one of DR Kane's [Great Britain geographic lookup tables](https://github.com/drkane/geo-lookups/) - very useful to have all that in one file!
+The data included in that file is sourced from the [ONS Geoportal](http://geoportal.statistics.gov.uk/) and contains public sector information licensed under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
 
-Earlier attempts at this were used as part of digital inclusion projects working for my employer [Citizens Online](https://www.citizensonline.org.uk).
+You can instead feed your own alternative lookup file to the script, either as a URL that sends a CSV or JSON return or as a local file.
+
+Earlier attempts at this were built and used as part of digital inclusion projects working for my employer [Citizens Online](https://www.citizensonline.org.uk).
 
 I'm not sure how useful it is to anyone else but as always it has been a good learning experience and adventure in using `R` to do this kind of thing.
 
 ## Installation
 
-When I have made this into a valid package, this should work:
+This should work:
 
 ``` r
 remotes::install_github("francisbarton/xstatic")
@@ -44,22 +49,22 @@ remotes::install_github("francisbarton/xstatic")
 
 ## Limitations
 
-There are many.
+There are many!
 
 Please let me know ideas for things I have missed,
 things I could have done more efficiently, or
 things you would like to see.
 
-The script involves building a JSON query programatically which is super-fragile, it seems, and probably doomed to failure.
+The script involves building a JSON query programatically, which is a super-fragile process.
 
-Please give it a try but be gentle, it is a fragile beast.
+Please give it a try but be gentle, it is a delicate beast.
 Let me know what breaks.
 
 Pull requests are welcomed and of course it's all MIT-licensed open code so fork away.
 
 * Currently the script is set up to get totals for a variety of geographic areas.
 Not to get data segmented by age, gender, claimant status etc, because that is beyond what I need currently.
-And it was complicated enough.
+And it was already complicated enough.
 * There's a load of hacks in there to accommodate places where the schema uses different table structures for different benefits
 * I was too lazy to include Travel to Work zones as an area filter in my area codes script but I don't think Stat-Xplore provides data at those levels anyway?
 
@@ -69,16 +74,9 @@ Just one example here so far.
 This gets Carers Allowance cases by MSOA level in the county (upper tier local authority) of Gloucestershire.
 
 ``` r
-# when valid package
-# library(xstatic)
+library(xstatic)
 
-# for now:
-library(here)
-
-source(here("R/data_slurp.R"))
-
-# here goes
-something <- data_slurp(
+something <- statx_slurp(
   
   # don't provide own list of area codes -> use built-in lookup (this is the default)
   areas_list = "", 
@@ -121,16 +119,17 @@ something <- data_slurp(
   chatty = TRUE
 )
 
-glimpse(something)
+glimpse::glimpse(something)
 
 ```
 
 ## Future plans
 
-* write up documentation for functions
-* include `testthat` and more `assertthat` lines in the code. Still learning.
-* increase coverage of the exception hacks in `get_dwp_codes.R`
-* make it into a proper package
+* [x] write up documentation for core function
+* [x] make it into a valid R package
+* [ ] write up documentation for other functions
+* [ ] include `testthat` and more `assertthat` lines in the code. Still learning.
+* [ ] increase coverage of the exception hacks in `get_dwp_codes.R`
 
 
 ### List of area aliases
@@ -172,6 +171,10 @@ if(use_aliases) {
   }
   
 ```
+
+## Code of Conduct
+
+Please note that the xstatic project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
 
 ### Contact me
 
