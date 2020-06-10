@@ -33,7 +33,7 @@ process_aliases <- function(input) {
     str_c(collapse = "")
 }
 
-extract_area_codes <- function(df, filter_level, filter_name, return_level, use_aliases, chatty = TRUE) {
+extract_area_codes <- function(df, filter_level, filter_area, return_level, use_aliases, chatty = TRUE) {
 
   if(use_aliases) {
     return_level <- paste0(process_aliases(return_level), "cd")
@@ -42,7 +42,8 @@ extract_area_codes <- function(df, filter_level, filter_name, return_level, use_
 
   if(filter_level == "") {
     area_codes <- df %>%
-      pull(.data$return_level) %>%
+      # pull(.data$return_level) %>% # I don't think I need .data here?
+      pull(return_level) %>%
       unique
     if(chatty) {
       ui_info("Extracting area codes from lookup table.")
@@ -52,7 +53,7 @@ extract_area_codes <- function(df, filter_level, filter_name, return_level, use_
   } else {
 
     assert_that(is.character(filter_level))
-    assert_that(is.character(filter_name))
+    assert_that(is.character(filter_area))
 
     if(use_aliases) {
       filter_level <- paste0(process_aliases(filter_level), "nm")
@@ -62,7 +63,7 @@ extract_area_codes <- function(df, filter_level, filter_name, return_level, use_
     if(chatty) {
       ui_info("Extracting area codes from lookup table.")
       ui_info(paste("Filtering lookup at level", filter_level))
-      ui_info(paste("Selecting only data within", filter_name))
+      ui_info(paste("Selecting only data within", filter_area))
       ui_info(paste("Extracting codes at", return_level, "level"))
     }
 
@@ -70,7 +71,7 @@ extract_area_codes <- function(df, filter_level, filter_name, return_level, use_
     filter_level <- ensym(filter_level)
 
     area_codes <- df %>%
-      filter(str_detect( {{filter_level}}, filter_name )) %>%
+      filter(str_detect( {{filter_level}}, filter_area )) %>%
       pull(return_level) %>%
       unique
   }
@@ -83,11 +84,11 @@ extract_area_codes <- function(df, filter_level, filter_name, return_level, use_
   return(area_codes)
 }
 
-obtain_codes <- function(
-  filter_level, filter_name, return_level, use_alias = TRUE, chatty = TRUE, ...) {
+get_area_codes <- function(
+  filter_level, filter_area, return_level, use_aliases = TRUE, chatty = TRUE, ...) {
 
   assert_that(is.data.frame(lookup))
-  codes <- lookup %>% extract_area_codes(., filter_level, filter_name, return_level, use_aliases = use_alias, chatty = chatty)
+  codes <- lookup %>% extract_area_codes(., filter_level, filter_area, return_level, use_aliases = use_aliases, chatty = chatty)
 }
 
 

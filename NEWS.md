@@ -1,3 +1,16 @@
+# xstatic 0.3.0
+
+* changes the name of the primary function from `statx_slurp` to `xstatic_slurp`!
+* (and changes the name of the relevant file)
+* makes significant changes to the parameter names of the main function:
+  * `location_level` becomes `filter_level`
+  * `filter_location` becomes `filter_area`
+  * `data_level` becomes `return_level`
+  * `use_alias` becomes `use_aliases`
+  * and other standardisations between parameter names in the primary function and auxiliary functions
+* makes changes to the examples in the man page and in the README
+* adds additional explanation and makes corrections in README.md
+
 # xstatic 0.2.0
 
 * many, many, many exhausting battles with the R package checks and documentation procedures

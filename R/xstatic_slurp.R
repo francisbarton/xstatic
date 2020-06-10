@@ -1,5 +1,5 @@
-#' statx_slurp
-#' @name statx_slurp
+#' xstatic_slurp
+#' @name xstatic_slurp
 #' @import httr
 #' @importFrom assertthat assert_that
 #' @importFrom dplyr bind_cols bind_rows ensym filter mutate mutate_at pull select slice tibble
@@ -15,37 +15,36 @@
 #' @importFrom usethis ui_info ui_stop
 #' @importFrom utils head tail
 #'
-#' @param areas_list provide a list of area codes for the query
 #' @param dataset_name name of the dataset on Stat-Xplore (partial/regex works)
-#' @param location_level return data within an area at this level
-#' @param filter_location return data within this area. defaults to ".*"
-#' @param data_level return data at this level
+#' @param areas_list provide a list of area codes for the query
+#' @param filter_level return data within an area at this level
+#' @param filter_area return data within this area. defaults to ".*"
+#' @param return_level return data at this level
 #' @param area_code_lookup use this source to lookup area codes at data_level within filter_location
-#' @param use_alias TRUE by default. Set to FALSE to turn off aliases for location_level and data_level
+#' @param use_aliases TRUE by default. Set to FALSE to turn off aliases for location_level and data_level
 #' @param batch_size If data for more than 1000 area codes are requested then they will be batched into queries of this size. Default is 1000.
 #' @param chatty TRUE by default. Provides verbose commentary on the query process.
-#' @param ... space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n`; see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a value for `ds`.
+#' @param ... space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n` (uses 1 (just return most recent period) by default); see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a different value for `ds`.
 #'
-#' @return Data frame
+#' @return A data frame
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' statx_slurp(
-#' areas_list = "",
+#' xstatic_slurp(
 #' dataset_name = "^Carers",
-#' location_level = "lad",
-#' filter_location = "City of London",
-#' data_level = "msoa",
+#' areas_list = "",
+#' filter_level = "lad",
+#' filter_area = "City of London",
+#' return_level = "msoa",
 #' periods_tail = 2,
-#' batch_size = 1000,
-#' use_alias = TRUE,
-#' chatty = TRUE)
-#' }
+#' periods_head = 1,
+#' use_aliases = TRUE,
+#' chatty = FALSE)
+#'
 
 utils::globalVariables(c("."))
 
-statx_slurp <- function(areas_list = "", dataset_name, location_level = "", filter_location = ".*", data_level, area_code_lookup = "", use_alias = TRUE, batch_size = 1000, chatty = TRUE, ...) {
+xstatic_slurp <- function(dataset_name, areas_list = "", filter_level = "", filter_area = ".*", return_level, area_code_lookup = "", use_aliases = TRUE, batch_size = 1000, chatty = TRUE, ...) {
 
   # source(here("R/slurp_helpers.R"))
 
@@ -53,10 +52,10 @@ statx_slurp <- function(areas_list = "", dataset_name, location_level = "", filt
     if(chatty) {
       ui_info("No list of area codes provided. Using a lookup instead.")
     }
-    # source(here("R/obtain_codes.R"))
+    # source(here("R/get_area_codes.R"))
 
     # make sure we've got a vector of area codes to work with -----------------
-    area_codes <- obtain_codes(location_level, filter_location, data_level, lookup = area_code_lookup, use_alias = use_alias, chatty = chatty)
+    area_codes <- get_area_codes(filter_level, filter_area, return_level, lookup = area_code_lookup, use_aliases = use_aliases, chatty = chatty)
     areas_list <- make_batched_list(area_codes, batch_size = batch_size)
 
     # not sure I am doing this right
@@ -72,7 +71,7 @@ statx_slurp <- function(areas_list = "", dataset_name, location_level = "", filt
   # get build codes/ids etc
   # source(here("R/get_dwp_codes.R"))
 
-  data_level <- process_aliases(data_level)
+  data_level <- process_aliases(return_level)
   geo_level <- geo_levels %>%
     filter(returns == data_level) %>%
     pull(geo_level)
