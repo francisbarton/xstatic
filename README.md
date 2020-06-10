@@ -18,7 +18,7 @@ I'm usually only interested in getting data for certain benefits at geographic a
 
 So this gives me the ability to do that, within its limitations.
 
-Tips of the my proverbial hat to
+Tips of my proverbial hat to
 
 * [Evan Odell](https://github.com/dr-uk/dwpstat),
 * [Oli Hawkins](https://github.com/olihawkins/statxplorer) and
