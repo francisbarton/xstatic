@@ -16,15 +16,15 @@
 #' @importFrom utils head tail
 #'
 #' @param dataset_name name of the dataset on Stat-Xplore (partial/regex works)
-#' @param areas_list provide a list of area codes for the query
+#' @param areas_list (optional) provide your own list of area codes for the query
 #' @param filter_level return data within an area at this level
-#' @param filter_area return data within this area. defaults to ".*"
+#' @param filter_area return data within this area. defaults to ".*" (all)
 #' @param return_level return data at this level
-#' @param area_code_lookup use this source to lookup area codes at data_level within filter_location
-#' @param use_aliases TRUE by default. Set to FALSE to turn off aliases for location_level and data_level
+#' @param area_code_lookup use this source to lookup area codes at return_level within filter_area
+#' @param use_aliases TRUE by default. Set to FALSE to turn off aliases for filter_level and return_level
 #' @param batch_size If data for more than 1000 area codes are requested then they will be batched into queries of this size. Default is 1000.
 #' @param chatty TRUE by default. Provides verbose commentary on the query process.
-#' @param ... space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n` (uses 1 (just return most recent period) by default); see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a different value for `ds`.
+#' @param ... space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n` (uses 1 - just return most recent period - by default); see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a different value for `ds`.
 #'
 #' @return A data frame
 #' @export
@@ -81,6 +81,7 @@ xstatic_slurp <- function(dataset_name, areas_list = "", filter_level = "", filt
   assert_that(is.list(build_list))
   assert_that(length(build_list) == 6)
 
+  # a simple list of the dates of the periods requested
   dates <- str_replace(build_list[["periods"]], "(.*:)([:digit:]*$)", "\\2")
 
   # create geo_codes_list
@@ -91,35 +92,42 @@ xstatic_slurp <- function(dataset_name, areas_list = "", filter_level = "", filt
       )
 
 
-  # map along each chunk of geo_codes_list to create a query for each chunk
-
-  # shamelessly borrowing this
-  # source(here("R/evanodell_sx_get_data_util.R"))
+  # map along each chunk of geo_codes_list to create a JSON query for each chunk
+  # then send each query to SX using dwp_get_data_util
+  # shamelessly borrowing this function:
+  # source(here("R/dwp_get_data_util.R"))
 
   data_out_list <- geo_codes_list %>%
     map( ~ build_query(
       build_list = build_list,
       geo_codes_chunk = .) %>%
-    sx_get_data_util(table_endpoint, .) %>%
+    dwp_get_data_util(table_endpoint, .) %>%
     pull_sx_data(., dates = dates))
 
-
+  # condense the list of data results into a single data frame
   data_out <- reduce(data_out_list, bind_rows)
+
+  # if all has gone well it should be this long:
   assert_that(nrow(data_out) == length(dates) * length(area_codes))
   ui_info(paste(nrow(data_out), "rows of data at", data_level, "level retrieved."))
 
+
   # ui_info(paste("Data level:", data_level))
+
+  # prepare area level codes and benefit name to be column names
   data_level_code <- paste0(data_level, "cd")
   data_level_name <- paste0(data_level, "nm")
   tidy_ben_name <- snakecase::to_snake_case(dataset_name)
   # ui_info(paste("Data level code:", data_level_code))
   # ui_info(paste("Data level name:", data_level_name))
 
+  # build final tibble as the result to return.
+  # Feels pretty risky due to use of bind_cols (as opposed to something like left_join);
+  # it ought to match up ok but it's vulnerable to glitches. Needs testing.
   tibble(data_date = rep(dates, each = length(area_codes))) %>%
     bind_cols(data_out) %>%
     select({{data_level_code}} := uris,
            {{data_level_name}} := labels,
            data_date,
            {{tidy_ben_name}} := values)
-
 }

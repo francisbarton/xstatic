@@ -29,7 +29,7 @@ Tips of my proverbial hat to
 for their prior work on this issue.
 There may be others with similar work I'm not yet aware of.
 
-This package relies at its core on Evan's `dwp_schema` and `sx_get_data_util` functions, and in a sense should be thought of as a wrapper for his work with additional bells and whistles.
+This package relies at its core on Evan's `dwp_schema` and `dwp_get_data_util` functions, and in a sense should be thought of as a wrapper for his work with additional bells and whistles.
 
 The package also provides, and by default uses, one of DR Kane's [Great Britain geographic lookup tables](https://github.com/drkane/geo-lookups/) - very useful to have all that in one file!
 The data included in that file is sourced from the [ONS Geoportal](http://geoportal.statistics.gov.uk/) and contains public sector information licensed under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).

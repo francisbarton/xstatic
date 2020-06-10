@@ -72,7 +72,7 @@ get_lookup <- function(overwrite = FALSE, chatty = TRUE) {
 
     # check to see if the file already exists
     if(!file.exists(destfile) || overwrite) {
-      utils::download.file(url, destfile, quiet = TRUE)
+      utils::download.file(drkane_url, destfile, quiet = TRUE)
     }
     else {
       ui_info(

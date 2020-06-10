@@ -23,11 +23,17 @@ get_dwp_codes <- function(
   }
 
   # get folder id code
-  folder <- sx_get_folder(ben)
+  folder <- dwpstat::dwp_schema() %>%
+    filter(label == ben) %>%
+    pull(id)
+
+  # I could combine these info reports into fewer blocks, but when kept separate
+  # they can help with debugging - help you to work out where a process fails
   if(chatty) {
     ui_info(paste0("Folder name is: ", folder))
   }
 
+  # just a bit of fun that feeds into a chatty info line below
   default <- "default "
   if(!ds == "") { default <- "" }
 
@@ -39,10 +45,10 @@ get_dwp_codes <- function(
                     "Employment and Support Allowance",
                     "Carers Allowance")
 
-  if (ds == "" && ben %in% universal_type) {
+  if(ds == "" && ben %in% universal_type) {
     ds = 3
   }
-  else if (ds == "") {
+  else if(ds == "") {
     ds = 1
   }
 
@@ -56,22 +62,27 @@ get_dwp_codes <- function(
     geo_type = 4
   }
 
+  if(ben %in% pension_type && ds == 3) {
+    period = 2
+    geo_type = 3
+  }
+
+
 
   # get chatty - show other options as well as the default
-  db_options <- sx_pull_col("label", folder)
   if(chatty) {
+    db_options <- sx_pull_col("label", folder)
     ui_info(paste0("Choosing ", default, "option: ds=", ds))
     ui_info(paste0("All options:\n\t", str_c(paste0(1:length(db_options), ": ", db_options), collapse = "\n\t")))
     ui_info(paste0("Data subset name is: ", db_options[ds]))
   }
 
-  # report the options that are being used - for reference
   db_id <- sx_pull_id(ds, folder)
+  # report the options that are being used - for reference
   if(chatty) {
     ui_info(paste0("Data subset id is: ", db_id))
+    ui_info(paste0("Available measures:\n\t", str_c(sx_pull_col("label", db_id), collapse = "\n\t")))
   }
-
-  ui_info(paste0("Available measures:\n\t", str_c(sx_pull_col("label", db_id), collapse = "\n\t")))
 
   # what numbers are going to be retrieved
   count_id <- dwpstat::dwp_schema(db_id) %>%
@@ -102,17 +113,22 @@ get_dwp_codes <- function(
   }
 
   geo_level_id <- sx_pull_id(geo_level, geo_field_id)
-  geo_level_label <- dwpstat::dwp_schema(geo_field_id) %>%
-      slice(geo_level) %>%
-      pull(label)
 
   if(chatty) {
     ui_info(paste("Geography level id is:", geo_level_id))
+
+    geo_level_label <- dwpstat::dwp_schema(geo_field_id) %>%
+      slice(geo_level) %>%
+      pull(label)
     ui_info(paste("Geography level is:", geo_level_label))
   }
 
-  # export list (info needed for construction of JSON API query)
-list(db_id = db_id, count_id = count_id, period_id = period_id, periods = periods, geo_field_id = geo_field_id, geo_level_id = geo_level_id)
+  # clear these out of env as no longer needed
+  rm(ben, db_options, folder, geo_type_id, geo_level_label,
+     universal_type, housing_type, pension_type)
+
+  # return list of codes (used as `build_list` for construction of JSON API query)
+  list(db_id = db_id, count_id = count_id, period_id = period_id, periods = periods, geo_field_id = geo_field_id, geo_level_id = geo_level_id)
 
 }
 
@@ -120,11 +136,10 @@ list(db_id = db_id, count_id = count_id, period_id = period_id, periods = period
 # helper functions used in the above --------------------------------------
 
 # these are all effectively wrappers around Evan Odell's `dwp_schema`
-# this is all quite messy
-# I've tried to make these as efficient as I can and remove duplication
+# I have tried to make these as efficient as I can and remove duplication
 
-# sx_pull_id and sx_pull_col are little procedures for digging down through the schema;
-# used within the other functions below (do not return useful info per se)
+# sx_pull_id and sx_pull_col are little manoeuvres for digging down through the schema;
+# they are used within the other functions (they do not return useful info per se)
 
 sx_pull_id <- function(slice, ...) {
   dwpstat::dwp_schema(...) %>%
@@ -134,12 +149,6 @@ sx_pull_id <- function(slice, ...) {
 sx_pull_col <- function(col, ...) {
   dwpstat::dwp_schema(...) %>%
     pull(col)
-}
-
-sx_get_folder <- function(nm) {
-  dwpstat::dwp_schema() %>%
-    filter(label == nm) %>%
-    pull(id)
 }
 
 sx_get_periods <- function(id, type = "VALUESET", ms = 1, tail = 1, head = "") {

@@ -1,3 +1,18 @@
+# xstatic 0.4.0
+
+* Tidies up the chatty bits of get_dwp_codes
+* Restores the original name of the dwp_get_data_util function in dwp_get_data_util.R
+* Adds more comments to code
+* Fixes error in data-raw/get_lookup_data.R
+* Adds extra hack to `get_dwp_codes.R` to cover change of ds:
+  ```r
+    if(ben %in% pension_type && ds == 3) {
+    period = 2
+    geo_type = 3
+  }
+  ```
+  fixes issue #1 (!)
+
 # xstatic 0.3.0
 
 * changes the name of the primary function from `statx_slurp` to `xstatic_slurp`!
