@@ -12,7 +12,7 @@
 #' @importFrom rlang .data :=
 #' @importFrom snakecase to_snake_case
 #' @importFrom stringr str_c str_detect str_glue str_replace str_subset
-#' @importFrom usethis ui_info ui_stop
+#' @importFrom usethis ui_info ui_stop use_data
 #' @importFrom utils head tail
 #'
 #' @param dataset_name name of the dataset on Stat-Xplore (partial/regex works)
