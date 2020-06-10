@@ -2,7 +2,7 @@
 # xstatic
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/francisbarton/xstatic.svg?branch=master)](https://travis-ci.com/francisbarton/xstatic)
+[![Travis build status](https://travis-ci.org/francisbarton/xstatic.svg?branch=master)](https://travis-ci.org/francisbarton/xstatic)
 <!-- badges: end -->
 
 The goal of `xstatic` is to make the user happy.
