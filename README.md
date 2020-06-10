@@ -7,7 +7,7 @@
 
 The goal of `xstatic` is to make the user happy.
 
-The [Stat-Xplore](https://stat-xplore.dwp.gov.uk/) interface rarely makes people happy.
+The [Stat-Xplore](https://stat-xplore.dwp.gov.uk/) interface [rarely makes people happy](https://twitter.com/evanodell/status/1192022986125131778).
 But things are going to change around here.
 
 ## Summary

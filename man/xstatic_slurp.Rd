@@ -6,23 +6,23 @@
 \arguments{
 \item{dataset_name}{name of the dataset on Stat-Xplore (partial/regex works)}
 
-\item{areas_list}{provide a list of area codes for the query}
+\item{areas_list}{(optional) provide your own list of area codes for the query}
 
 \item{filter_level}{return data within an area at this level}
 
-\item{filter_area}{return data within this area. defaults to ".*"}
+\item{filter_area}{return data within this area. defaults to ".*" (all)}
 
 \item{return_level}{return data at this level}
 
-\item{area_code_lookup}{use this source to lookup area codes at data_level within filter_location}
+\item{area_code_lookup}{use this source to lookup area codes at return_level within filter_area}
 
-\item{use_aliases}{TRUE by default. Set to FALSE to turn off aliases for location_level and data_level}
+\item{use_aliases}{TRUE by default. Set to FALSE to turn off aliases for filter_level and return_level}
 
 \item{batch_size}{If data for more than 1000 area codes are requested then they will be batched into queries of this size. Default is 1000.}
 
 \item{chatty}{TRUE by default. Provides verbose commentary on the query process.}
 
-\item{...}{space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n` (uses 1 (just return most recent period) by default); see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a different value for `ds`.}
+\item{...}{space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n` (uses 1 - just return most recent period - by default); see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a different value for `ds`.}
 }
 \value{
 A data frame
