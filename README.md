@@ -14,6 +14,8 @@ But things are going to change around here.
 
 I wanted to build a script that would enable me to easily retrieve benefit claims data at various geographic levels across England (and possibly Wales, Scotland and Northern Ireland also), without having to go the Stat-Xplore website and download a csv or a JSON query.
 
+And to allow easy updating, including programmatically or automatically, from within R.
+
 I'm usually only interested in getting data for certain benefits at geographic areas eg Census areas, not by Job Centre, and not using multiple filters or wafers or whatever.
 
 So this gives me the ability to do that, within its limitations.
