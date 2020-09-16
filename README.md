@@ -36,7 +36,7 @@ The data included in that file is sourced from the [ONS Geoportal](http://geopor
 
 You can instead feed your own alternative lookup file to the script, either as a URL that sends a CSV or JSON return or as a local file.
 
-Earlier attempts at this were built and used as part of digital inclusion projects working for my employer [Citizens Online](https://www.citizensonline.org.uk).
+This approach was developed as part of digital inclusion projects working for my employer [Citizens Online](https://www.citizensonline.org.uk).
 
 I'm not sure how useful it is to anyone else but as always it has been a good learning experience and adventure in using `R` to do this kind of thing.
 
@@ -157,7 +157,9 @@ From `get_area_codes.R`.
 
 Using any of the aliases in the first list below will be translated to the return string from the second list.
 Matching is not case-sensitive.
-Purely added in for informality/user-friendliness.
+Purely added in for informality/user-friendliness, but also for continuity/backwards compatibility:
+for example "local" will match "lad20" but will also match future prefixes eg "lad21" if codes are updated next year
+(and if I update the code), whereas "lad20" will potentially break in future.
 
 This works for `filter_level` and `return_level` in the `xstatic_slurp` script.
 
