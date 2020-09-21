@@ -6,7 +6,7 @@
 \arguments{
 \item{dataset_name}{name of the dataset on Stat-Xplore (partial/regex works)}
 
-\item{areas_list}{(optional) provide your own list of area codes for the query}
+\item{area_codes}{(optional) provide your own vector (list) of area codes for the query (don't use built-in lookup)}
 
 \item{filter_level}{return data within an area at this level}
 
@@ -33,7 +33,7 @@ xstatic_slurp
 \examples{
 xstatic_slurp(
 dataset_name = "^Carers",
-areas_list = "",
+area_codes = "",
 filter_level = "lad",
 filter_area = "City of London",
 return_level = "msoa",

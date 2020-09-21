@@ -16,7 +16,7 @@
 #' @importFrom utils head tail
 #'
 #' @param dataset_name name of the dataset on Stat-Xplore (partial/regex works)
-#' @param areas_list (optional) provide your own list of area codes for the query
+#' @param area_codes (optional) provide your own vector (list) of area codes for the query (don't use built-in lookup)
 #' @param filter_level return data within an area at this level
 #' @param filter_area return data within this area. defaults to ".*" (all)
 #' @param return_level return data at this level
@@ -32,7 +32,7 @@
 #' @examples
 #' xstatic_slurp(
 #' dataset_name = "^Carers",
-#' areas_list = "",
+#' area_codes = "",
 #' filter_level = "lad",
 #' filter_area = "City of London",
 #' return_level = "msoa",
@@ -44,18 +44,19 @@
 
 utils::globalVariables(c("."))
 
-xstatic_slurp <- function(dataset_name, areas_list = "", filter_level = "", filter_area = ".*", return_level, area_code_lookup = "", use_aliases = TRUE, batch_size = 1000, chatty = TRUE, ...) {
+xstatic_slurp <- function(dataset_name, area_codes = "", filter_level = "", filter_area = ".*", return_level, area_code_lookup = "", use_aliases = TRUE, batch_size = 1000, chatty = TRUE, ...) {
 
   # source(here("R/slurp_helpers.R"))
 
-  if(areas_list == "") {
+  if(area_codes == "") {
     if(chatty) {
       ui_info("No list of area codes provided. Using a lookup instead.")
     }
-    # source(here("R/get_area_codes.R"))
 
-    # make sure we've got a vector of area codes to work with -----------------
+    # source(here("R/get_area_codes.R"))
     area_codes <- get_area_codes(filter_level, filter_area, return_level, lookup = area_code_lookup, use_aliases = use_aliases, chatty = chatty)
+  }
+
     areas_list <- make_batched_list(area_codes, batch_size = batch_size)
 
     # not sure I am doing this right
@@ -63,9 +64,8 @@ xstatic_slurp <- function(dataset_name, areas_list = "", filter_level = "", filt
     assert_that(length(areas_list) > 0)
 
     if(chatty) {
-      ui_info(paste(length(area_codes), "area codes retrieved and batched into a list of", length(areas_list), "batches, of max batch size", batch_size))
+      ui_info(paste(length(area_codes), "area codes retrieved and batched into a list of", length(areas_list), "batches"))
     }
-  }
 
 
   # get build codes/ids etc

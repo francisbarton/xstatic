@@ -123,9 +123,11 @@ get_dwp_codes <- function(
     ui_info(paste("Geography level is:", geo_level_label))
   }
 
+  if(chatty) {
   # clear these out of env as no longer needed
   rm(ben, db_options, folder, geo_type_id, geo_level_label,
      universal_type, housing_type, pension_type)
+  }
 
   # return list of codes (used as `build_list` for construction of JSON API query)
   list(db_id = db_id, count_id = count_id, period_id = period_id, periods = periods, geo_field_id = geo_field_id, geo_level_id = geo_level_id)
