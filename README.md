@@ -86,7 +86,7 @@ The example in the manual (`?xstatic`) is a much smaller one.
 ``` r
 library(xstatic)
 
-something <- xstatic_slurp(
+something <- xstatic(
   
   # should find "Universal Credit" (R-style regexes are accepted)
   # will throw an error if there's more than one match - should be fixable
@@ -112,7 +112,7 @@ something <- xstatic_slurp(
   # "return data at level:" - `LSOA` works as an alias for `lsoa11cd`
   return_level = "LSOA",
   
-  # not used directly by `xstatic_slurp`;
+  # not used directly by `xstatic`;
   # it's passed via `...` to a sub-function.
   # Return this many of the most recent issues of the data.
   # Defaults to 1 if not provided (ie just returns most recent data
@@ -126,10 +126,6 @@ something <- xstatic_slurp(
   # into queries of `batch_size` so as not to overwhelm the API.
   # Default is 1000
   batch_size = 1000,
-  
-  # currently TRUE by default but you have the option to disable it
-  # if for some reason the feature is stopping your query from working
-  use_aliases = TRUE,
   
   # currently TRUE by default for testing purposes.
   # Best to turn it off if embedding in another script or automated report
@@ -161,9 +157,7 @@ Purely added in for informality/user-friendliness, but also for continuity/backw
 for example "local" will match "lad20" but will also match future prefixes eg "lad21" if codes are updated next year
 (and if I update the code), whereas "lad20" will potentially break in future.
 
-This works for `filter_level` and `return_level` in the `xstatic_slurp` script.
-
-*NB this is designed to work with DR Kane's lookup table or anything else that uses the same area codes as variable names/colnames. If you're supplying a different lookup table these may well break.* You can turn this aliasing behaviour off by passing `use_aliases = FALSE`.
+This works for `filter_level` and `return_level` in the `xstatic` script.
 
 ```{r}
 geo_levels <- tibble(
@@ -180,18 +174,9 @@ geo_levels <- tibble(
     "utla",
     "lad20",
     "msoa11",
-    "lsoa11"),
-  geo_level = c(7:2)
+    "lsoa11")
 )
 
-if(use_aliases) {
-    return_level <- paste0(process_aliases(return_level), "cd")
-  }
-  
-if(use_aliases) {
-    filter_level <- paste0(process_aliases(filter_level), "nm")
-  }
-  
 ```
 
 ## Code of Conduct

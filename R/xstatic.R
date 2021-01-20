@@ -1,8 +1,8 @@
-#' xstatic_slurp
-#' @name xstatic_slurp
+#' xstatic
+#' @name xstatic
 #' @import httr
 #' @importFrom assertthat assert_that
-#' @importFrom dplyr bind_cols bind_rows ensym filter mutate mutate_at pull select slice tibble
+#' @importFrom dplyr across bind_cols bind_rows ensym filter mutate mutate_at pull select slice tibble
 #' @importFrom dwpstat dwp_schema
 #' @importFrom here here
 #' @importFrom janitor clean_names
@@ -21,7 +21,6 @@
 #' @param filter_area return data within this area. defaults to ".*" (all)
 #' @param return_level return data at this level
 #' @param area_code_lookup use this source to lookup area codes at return_level within filter_area
-#' @param use_aliases TRUE by default. Set to FALSE to turn off aliases for filter_level and return_level
 #' @param batch_size If data for more than 1000 area codes are requested then they will be batched into queries of this size. Default is 1000.
 #' @param chatty TRUE by default. Provides verbose commentary on the query process.
 #' @param ... space to pass parameters to the helper function get_dwp_codes, mainly to do with the number of recent periods (months or quarters) to retrieve data for: provide `periods_tail = n` (uses 1 - just return most recent period - by default); see also `periods_head`; you can also tweak the query away from the default of Census geographies to Westminster constituencies, for example, where available, by providing a different value for `geo_type`; you can also change the subset of data from the default by providing a different value for `ds`.
@@ -30,40 +29,31 @@
 #' @export
 #'
 #' @examples
-#' xstatic_slurp(
+#' xstatic(
 #' dataset_name = "^Carers",
-#' area_codes = "",
 #' filter_level = "lad",
 #' filter_area = "City of London",
 #' return_level = "msoa",
 #' periods_tail = 2,
 #' periods_head = 1,
-#' use_aliases = TRUE,
 #' chatty = FALSE)
 #'
 
 utils::globalVariables(c("."))
 
-xstatic_slurp <- function(dataset_name, area_codes = "", filter_level = "", filter_area = ".*", return_level, area_code_lookup = "", use_aliases = TRUE, batch_size = 1000, chatty = TRUE, ...) {
+xstatic <- function(dataset_name, area_codes = NULL, filter_level = NULL, filter_area = ".*", return_level, area_code_lookup = NULL, batch_size = 1000, chatty = TRUE, ...) {
 
-  # source(here("R/slurp_helpers.R"))
-
-  if(area_codes == "") {
-    if(chatty) {
+  if (is.null(area_codes)) {
+    if (chatty) {
       ui_info("No list of area codes provided. Using a lookup instead.")
     }
 
-    # source(here("R/get_area_codes.R"))
-    area_codes <- get_area_codes(filter_level, filter_area, return_level, lookup = area_code_lookup, use_aliases = use_aliases, chatty = chatty)
+    area_codes <- get_area_codes(filter_level, filter_area, return_level, area_code_lookup = area_code_lookup, chatty = chatty)
   }
 
     areas_list <- make_batched_list(area_codes, batch_size = batch_size)
 
-    # not sure I am doing this right
-    assert_that(is.list(areas_list))
-    assert_that(length(areas_list) > 0)
-
-    if(chatty) {
+    if (chatty) {
       ui_info(paste(length(area_codes), "area codes retrieved and batched into a list of", length(areas_list), "batches"))
     }
 
@@ -82,7 +72,8 @@ xstatic_slurp <- function(dataset_name, area_codes = "", filter_level = "", filt
   assert_that(length(build_list) == 6)
 
   # a simple list of the dates of the periods requested
-  dates <- str_replace(build_list[["periods"]], "(.*:)([:digit:]*$)", "\\2")
+  dates <- str_replace(build_list[["periods"]], "(.*:)([:digit:]+$)", "\\2") %>%
+    as.integer()
 
   # create geo_codes_list
   geo_codes_list <- areas_list %>%
@@ -109,7 +100,9 @@ xstatic_slurp <- function(dataset_name, area_codes = "", filter_level = "", filt
 
   # if all has gone well it should be this long:
   assert_that(nrow(data_out) == length(dates) * length(area_codes))
-  ui_info(paste(nrow(data_out), "rows of data at", data_level, "level retrieved."))
+  if (chatty) {
+    ui_info(paste(nrow(data_out), "rows of data at", data_level, "level retrieved."))
+  }
 
 
   # ui_info(paste("Data level:", data_level))

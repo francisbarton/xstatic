@@ -92,16 +92,16 @@ convert_geo_ids <- function(id, x) {
 
 # extract and tidy the data from each SX API return
 # dates is a list of all the data point dates returned (just the most recent 1 by default)
-pull_sx_data <- function(df, dates) {
-  df %>%
+pull_sx_data <- function(lst, dates) {
+  lst %>%
     pluck("fields", "items", 1) %>%
     select(-1) %>%
     # extract area codes
-    mutate_at("uris", ~ str_replace(., "(.*:)([:alnum:]*$)", "\\2") %>% unlist()) %>%
+    mutate(across(uris, ~ str_replace(., "(.*:)([:alnum:]+$)", "\\2"))) %>%
     # area names
-    mutate_at("labels", ~ unlist(.)) %>%
+    mutate(across(c(uris, labels), ~ unlist(.))) %>%
     # repeat as many times as needed (repeat each area for each item of dates)
     # shouldn't this be map_dfr? - need to investigate what happens
     map_dfc( ~ rep(., times = length(dates))) %>%
-    bind_cols(values = c(pluck(df, "cubes", 1, "values")))
+    bind_cols(values = c(pluck(lst, "cubes", 1, "values")))
 }

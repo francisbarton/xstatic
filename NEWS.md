@@ -6,7 +6,7 @@
 * Fixes error in data-raw/get_lookup_data.R
 * Adds extra hack to `get_dwp_codes.R` to cover change of ds:
   ```r
-    if(ben %in% pension_type && ds == 3) {
+    if (ben %in% pension_type && ds == 3) {
     period = 2
     geo_type = 3
   }
