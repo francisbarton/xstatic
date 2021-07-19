@@ -1,3 +1,9 @@
+# xstatic 0.4.2
+
+* Not sure what happened to 0.4.1
+* Rejigged `get_dwp_codes` quite a bit. Some queries weren't working. Still needs better documentation.
+
+
 # xstatic 0.4.0
 
 * Tidies up the chatty bits of get_dwp_codes

@@ -74,7 +74,7 @@ extract_area_codes <- function(df, filter_level, filter_area, return_level, chat
 }
 
 get_area_codes <- function(
-  filter_level, filter_area, return_level, area_code_lookup, chatty = TRUE, ...) {
+  filter_level, filter_area, return_level, area_code_lookup = NULL, chatty = TRUE, ...) {
 
   if (is.null(area_code_lookup)) area_code_lookup <- lookup
 

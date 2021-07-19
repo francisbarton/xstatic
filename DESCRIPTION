@@ -1,7 +1,7 @@
 Package: xstatic
 Type: Package
 Title: Builds Queries And Retrieves Data From DWP Stat-Xplore
-Version: 0.4.1
+Version: 0.4.2
 Author: Fran Barton
 Maintainer: Fran Barton <fbarton@alwaysdata.net>
 Description: Relatively user-friendly approach to formulating queries to the Stat-Xplore API,
