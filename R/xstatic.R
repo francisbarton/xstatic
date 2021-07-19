@@ -1,4 +1,5 @@
 #' xstatic
+#'
 #' @name xstatic
 #' @import httr
 #' @importFrom assertthat assert_that
@@ -15,7 +16,7 @@
 #' @importFrom usethis ui_info ui_stop use_data
 #' @importFrom utils head tail
 #'
-#' @param dataset_name name of the dataset on Stat-Xplore (partial/regex works)
+#' @param x name of a benefit dataset on Stat-Xplore (partial/regex works)
 #' @param area_codes (optional) provide your own vector (list) of area codes for the query (don't use built-in lookup)
 #' @param filter_level return data within an area at this level
 #' @param filter_area return data within this area. defaults to ".*" (all)
@@ -30,7 +31,7 @@
 #'
 #' @examples
 #' xstatic(
-#' dataset_name = "^Carers",
+#' x = "^Carers",
 #' filter_level = "lad",
 #' filter_area = "City of London",
 #' return_level = "msoa",
@@ -41,7 +42,7 @@
 
 utils::globalVariables(c("."))
 
-xstatic <- function(dataset_name, area_codes = NULL, filter_level = NULL, filter_area = ".*", return_level, area_code_lookup = NULL, batch_size = 1000, chatty = TRUE, ...) {
+xstatic <- function(x, area_codes = NULL, filter_level = NULL, filter_area = ".*", return_level, area_code_lookup = NULL, batch_size = 1000, chatty = TRUE, ...) {
 
   if (is.null(area_codes)) {
     if (chatty) {
@@ -66,7 +67,7 @@ xstatic <- function(dataset_name, area_codes = NULL, filter_level = NULL, filter
     filter(returns == data_level) %>%
     pull(geo_level)
 
-  build_list <- get_dwp_codes(dataset_name, geo_level = geo_level, chatty = chatty, ...)
+  build_list <- get_dwp_codes(ben = x, geo_level = geo_level, chatty = chatty, ...)
 
   assert_that(is.list(build_list))
   assert_that(length(build_list) == 6)
@@ -92,7 +93,7 @@ xstatic <- function(dataset_name, area_codes = NULL, filter_level = NULL, filter
     map( ~ build_query(
       build_list = build_list,
       geo_codes_chunk = .) %>%
-    dwp_get_data_util(table_endpoint, .) %>%
+    dwp_get_data_util() %>%
     pull_sx_data(., dates = dates))
 
   # condense the list of data results into a single data frame
@@ -110,7 +111,7 @@ xstatic <- function(dataset_name, area_codes = NULL, filter_level = NULL, filter
   # prepare area level codes and benefit name to be column names
   data_level_code <- paste0(data_level, "cd")
   data_level_name <- paste0(data_level, "nm")
-  tidy_ben_name <- snakecase::to_snake_case(dataset_name)
+  tidy_ben_name <- snakecase::to_snake_case(x)
   # ui_info(paste("Data level code:", data_level_code))
   # ui_info(paste("Data level name:", data_level_name))
 

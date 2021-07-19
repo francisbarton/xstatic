@@ -1,12 +1,12 @@
 get_dwp_codes <- function(
   ben,
   ds = NULL,
-  period = 2,
+  measure = NULL,
   periods_tail = 1,
   periods_head = NULL,
-  geo_dataset_id = 4,
-  geo_type = 1,
-  geo_level = 2,
+  geo_dataset_id = NULL,
+  geo_type = NULL,
+  geo_level = NULL,
   chatty = TRUE) {
 
   # store a list of all datasets available from the StatX API
@@ -40,47 +40,53 @@ get_dwp_codes <- function(
   # exception hacks
   # add more to these lists as we discover them
   universal_type <- c("Universal Credit")
+  disability_type <- c("Personal Independence Payment")
   housing_type <- c("Housing Benefit")
   pension_type <- c("Pension Credit",
                     "Employment and Support Allowance",
                     "Carers Allowance",
                     "Disability Living Allowance")
-  disability_type <- c("Personal Independence Payment")
 
 
-  if (is.null(ds) && ben %in% c(universal_type, disability_type)) {
-    ds <- 3
-  }
-  else if (is.null(ds)) {
-    ds <- 1
-  }
-
-  # Households on UC as opposed to "people on"
-  if (ds == 2 && ben %in% universal_type) {
-    period <- 3
-  }
-
-  if (ben %in% housing_type) {
-    period <- 4
-    geo_dataset_id <- 6
+  if (is.null(ds)) {
+    if (ben %in% universal_type) {
+      ds <- 2
+      geo_dataset_id <- 5
+      measure <- 4
+    } else if (ben %in% disability_type) {
+      ds <- 3
+    } else {
+      ds <- 1
+    }
   }
 
-  if (ben %in% pension_type) {
-    period <- 3
+  if (is.null(measure)) {
+    if (ben %in% universal_type) {
+      measure <- 2
+    } else if (ben %in% housing_type) {
+      measure <- 4
+    } else {
+      measure <- 3
+    }
   }
 
-  if (ben %in% pension_type && ds == 3) {
-    period <- 2
-    geo_type <- 3
+  if (is.null(geo_dataset_id)) {
+    if (ben %in% housing_type) {
+      geo_dataset_id <- 6
+    } else {
+      geo_dataset_id <- 4
+    }
   }
 
-  if (ben %in% disability_type) {
-    period <- 3
-    geo_dataset_id <- 4
+  if (is.null(geo_type)) {
     geo_type <- 1
   }
 
-
+  # this should usually be provided by xstatic.R but here is a fallback
+  # (2 = LSOA level)
+  if (is.null(geo_level)) {
+    geo_level <- 2
+  }
 
 
   # get chatty - show other options as well as the default
@@ -106,12 +112,12 @@ get_dwp_codes <- function(
     ui_info(paste("Count id is:", count_id))
   }
 
-  # period info: month or quarter and how many
-  period_id <- sx_pull_id(period, db_id)
+  # specific measure
+  measure_id <- sx_pull_id(measure, db_id)
   if (chatty) {
-    ui_info(paste("Period id is:", period_id))
+    ui_info(paste("Measure id is:", measure_id))
   }
-  periods <- sx_get_periods(period_id, tail = periods_tail, head = periods_head)
+  periods <- sx_get_periods(measure_id, tail = periods_tail, head = periods_head)
   if (chatty) {
     ui_info(paste("Latest period code:", tail(periods, 1)))
   }
@@ -128,19 +134,18 @@ get_dwp_codes <- function(
   }
 
   geo_level_id <- sx_pull_id(geo_level, geo_area_type)
-
   if (chatty) {
     ui_info(paste("Geography level id is:", geo_level_id))
   }
 
   if (chatty) {
   # clear these out of env as no longer needed
-  rm(ben, db_options, folder, geo_area_type,
+  rm(ben, db_options, folder, geo_dataset,
      universal_type, housing_type, pension_type)
   }
 
   # return list of codes (used as `build_list` for construction of JSON API query)
-  list(db_id = db_id, count_id = count_id, period_id = period_id, periods = periods, geo_dataset = geo_dataset, geo_level_id = geo_level_id)
+  list(db_id = db_id, count_id = count_id, measure_id = measure_id, periods = periods, geo_area_type = geo_area_type, geo_level_id = geo_level_id)
 
 }
 
@@ -167,7 +172,7 @@ sx_get_periods <- function(id, type = "VALUESET", ms = 1, tail = 1, head = NULL)
 
   # if periods_head not specified, or larger than tail, then set it to same as
   # periods_tail so it has no effect
-  if (is.null(head) | head > tail) { head <- tail }
+  if (is.null(head) || head > tail) { head <- tail }
 
   dwpstat::dwp_schema(id) %>%
     filter(type == type) %>%

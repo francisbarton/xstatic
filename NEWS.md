@@ -1,3 +1,11 @@
+# xstatic 0.4.3
+
+* Bit more tidying up and fixing things I just broke
+* Making the logic for parameter choice in `get_dwp_codes` more robust, and reworked it so default params are NULL, you can override with your own selections
+* changed `period_id` to `measure_id` but I am not sure if that is good or not
+* TODO: write up parameter choice combinations eg what to do if you want to switch from Universal Credit claims (caseload) dataset to the Households on UC dataset.
+
+
 # xstatic 0.4.2
 
 * Not sure what happened to 0.4.1

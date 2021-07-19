@@ -92,7 +92,7 @@ something <- xstatic(
   # will throw an error if there's more than one match - should be fixable
   # by providing a more specific string (chatty mode will show you the options)
   # What you pass here will be used as the column name for your data output (but it still has to match!)
-  dataset_name = "^Universal",
+  x = "^Universal",
 
   # provide own list of area codes or leave as empty string to use the built-in lookup table
   # (this is the default)

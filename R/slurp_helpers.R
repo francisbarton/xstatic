@@ -59,8 +59,8 @@ build_query <- function(build_list, geo_codes_chunk) {
   )
 
   id_list <- list(
-    build_list[["geo_field_id"]],
-    build_list[["period_id"]]
+    build_list[["geo_area_type"]],
+    build_list[["measure_id"]]
   )
 
   recodes_section <- build_recodes(id_list = id_list, chunk = geo_codes_chunk)

@@ -4,7 +4,7 @@
 \alias{xstatic}
 \title{xstatic}
 \arguments{
-\item{dataset_name}{name of the dataset on Stat-Xplore (partial/regex works)}
+\item{x}{name of a benefit dataset on Stat-Xplore (partial/regex works)}
 
 \item{area_codes}{(optional) provide your own vector (list) of area codes for the query (don't use built-in lookup)}
 
@@ -30,7 +30,7 @@ xstatic
 }
 \examples{
 xstatic(
-dataset_name = "^Carers",
+x = "^Carers",
 filter_level = "lad",
 filter_area = "City of London",
 return_level = "msoa",

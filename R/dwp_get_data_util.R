@@ -1,15 +1,13 @@
 
-# from dwpstat package by Evan Odell
+# adapted from dwpstat package by Evan Odell
 
-# library(httr)
-# library(jsonlite)
+dwp_get_data_util <- function(query) {
 
-table_endpoint <- "https://stat-xplore.dwp.gov.uk/webapi/rest/v1/table"
+  table_endpoint <- "https://stat-xplore.dwp.gov.uk/webapi/rest/v1/table"
 
-dwp_get_data_util <- function(query, body_query) {
   api_get <- httr::POST(
-    url = query,
-    body = body_query,
+    url = table_endpoint,
+    body = query,
     config = httr::add_headers(APIKey = getOption("DWP.API.key")),
     encode = "json"
   )
@@ -29,6 +27,7 @@ dwp_get_data_util <- function(query, body_query) {
     )
   }
 
-  fromJSON(httr::content(api_get, as = "text"), flatten = TRUE)
+  httr::content(api_get, as = "text") %>%
+    jsonlite::fromJSON(flatten = TRUE)
 }
 
