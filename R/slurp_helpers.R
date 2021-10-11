@@ -11,36 +11,36 @@ build_recodes <- function(id_list, chunk, total = "false") {
 
   # sub-function
   recode_paste <- function(x, y, ...) {
-    str_c(
-      str_c("\"", x, "\" : {"),
-      str_c("\"map\" : [ ",
-                     str_c(y, collapse = ","),
+    stringr::str_c(
+      stringr::str_c("\"", x, "\" : {"),
+      stringr::str_c("\"map\" : [ ",
+                     stringr::str_c(y, collapse = ","),
             " ],"),
-      str_c("\"total\" : ", ...),
+      stringr::str_c("\"total\" : ", ...),
       "}")
   }
 
   # sub-function
   create_recodes <- function(field_id, area_id, ...) {
-    str_c("[ \"", area_id, "\" ]") %>%
+    stringr::str_c("[ \"", area_id, "\" ]") %>%
       recode_paste(x = field_id, y = ., ...) %>%
-      str_c(collapse = "", sep = ",")
+      stringr::str_c(collapse = "", sep = ",")
   }
 
 
   # main part of build_recodes
   # take a list of codes and a chunk of area codes and map along them with `create_recodes`
-  map2_chr(id_list, chunk,
+  purrr::map2_chr(id_list, chunk,
            ~ create_recodes(field_id = .x, area_id = .y, total = total)) %>%
-    str_c(collapse = ",") %>%
-    str_c("\"recodes\" : {", ., "}")
+    stringr::str_c(collapse = ",") %>%
+    stringr::str_c("\"recodes\" : {", ., "}")
 }
 
 # build another part of the JSON query
 build_dimensions <- function(x) {
-  str_c("[ \"", x, "\" ]") %>%
-    str_c(., collapse = ",") %>%
-    str_c("\"dimensions\" : [", ., "]")
+  stringr::str_c("[ \"", x, "\" ]") %>%
+    stringr::str_c(., collapse = ",") %>%
+    stringr::str_c("\"dimensions\" : [", ., "]")
 }
 
 # this is where it all gets brought together
@@ -51,10 +51,10 @@ build_query <- function(build_list, geo_codes_chunk) {
 
   # make all the parts (helper functions below, outside this function)
 
-  query_db <- str_c(
+  query_db <- stringr::str_c(
     "\"database\" : \"", build_list[["db_id"]], "\""
   )
-  query_ms <- str_c(
+  query_ms <- stringr::str_c(
     "\"measures\" : [ \"", build_list[["count_id"]], "\" ]"
   )
 
@@ -70,13 +70,13 @@ build_query <- function(build_list, geo_codes_chunk) {
 
 
   # actually combine everything into a JSON query
-  str_c(
+  stringr::str_c(
     query_db,
     query_ms,
     recodes_section,
     query_dimensions,
     sep = ",") %>%
-    str_c(
+    stringr::str_c(
       "{", ., "}"
     )
 }
@@ -85,7 +85,7 @@ build_query <- function(build_list, geo_codes_chunk) {
 # from each area code and `build_list[["geo_level_id"]]`
 convert_geo_ids <- function(id, x) {
   id %>%
-    str_replace("valueset", "value") %>%
+    stringr::str_replace("valueset", "value") %>%
     paste0(., ":", x)
 }
 
@@ -94,14 +94,14 @@ convert_geo_ids <- function(id, x) {
 # dates is a list of all the data point dates returned (just the most recent 1 by default)
 pull_sx_data <- function(lst, dates) {
   lst %>%
-    pluck("fields", "items", 1) %>%
-    select(-1) %>%
+    purrr::pluck("fields", "items", 1) %>%
+    dplyr::select(-1) %>%
     # extract area codes
-    mutate(across(uris, ~ str_replace(., "(.*:)([:alnum:]+$)", "\\2"))) %>%
+    dplyr::mutate(across(uris, ~ stringr::str_replace(., "(.*:)([:alnum:]+$)", "\\2"))) %>%
     # area names
-    mutate(across(c(uris, labels), ~ unlist(.))) %>%
+    dplyr::mutate(across(c(uris, labels), ~ unlist(.))) %>%
     # repeat as many times as needed (repeat each area for each item of dates)
     # shouldn't this be map_dfr? - need to investigate what happens
-    map_dfc( ~ rep(., times = length(dates))) %>%
-    bind_cols(values = c(pluck(lst, "cubes", 1, "values")))
+    purrr::map_dfc( ~ rep(., times = length(dates))) %>%
+    dplyr::bind_cols(values = c(purrr::pluck(lst, "cubes", 1, "values")))
 }

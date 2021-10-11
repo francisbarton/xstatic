@@ -3,6 +3,19 @@
 \name{xstatic}
 \alias{xstatic}
 \title{xstatic}
+\usage{
+xstatic(
+  x,
+  area_codes = NULL,
+  filter_level = NULL,
+  filter_area = ".*",
+  return_level,
+  area_code_lookup = NULL,
+  geo_level = NULL,
+  chatty = TRUE,
+  ...
+)
+}
 \arguments{
 \item{x}{name of a benefit dataset on Stat-Xplore (partial/regex works)}
 
@@ -16,7 +29,7 @@
 
 \item{area_code_lookup}{use this source to lookup area codes at return_level within filter_area}
 
-\item{batch_size}{If data for more than 1000 area codes are requested then they will be batched into queries of this size. Default is 1000.}
+\item{geo_level}{If for some reason you need to pass a return_level that is different from the standard options, you will also need to pass a geo_level - an integer between 1 and 7, where 1 means "OA" and 7 refers to "country"}
 
 \item{chatty}{TRUE by default. Provides verbose commentary on the query process.}
 
@@ -31,11 +44,10 @@ xstatic
 \examples{
 xstatic(
 x = "^Carers",
-filter_level = "lad",
-filter_area = "City of London",
-return_level = "msoa",
-periods_tail = 2,
-periods_head = 1,
+filter_level = "lad", # case-insensitive
+filter_area = "City of London", # case sensitive
+return_level = "MsOa", # case-insensitive
+periods_tail = 2, # starting with most recent available month/quarter
+periods_head = 1, # returns penultimate data period only (ie first 1 of 2)
 chatty = FALSE)
-
 }

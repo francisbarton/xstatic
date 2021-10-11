@@ -94,12 +94,12 @@ something <- xstatic(
   # What you pass here will be used as the column name for your data output (but it still has to match!)
   x = "^Universal",
 
-  # provide own list of area codes or leave as empty string to use the built-in lookup table
+  # provide own list of area codes or leave as NULL to use the built-in lookup table
   # (this is the default)
-  areas_list = "", 
+  area_codes = NULL,
   
   # "filter at level:" - `upper` works as an alias for to `utlacd`
-  filter_level = "upper", 
+  filter_level = "upper",
   
   # "filter by name (optional) - if not provided then should return all (neutralises filter_level) 
   # in theory you can pass a string of piped strings (as OR booleans) to this
@@ -121,11 +121,6 @@ something <- xstatic(
   # for example get just the data from the third-latest issue
   # but not the last two (yes I do this sometimes)
   periods_tail = 2,
-  
-  # if more than 1000 areas are requested then they will be batched
-  # into queries of `batch_size` so as not to overwhelm the API.
-  # Default is 1000
-  batch_size = 1000,
   
   # currently TRUE by default for testing purposes.
   # Best to turn it off if embedding in another script or automated report
