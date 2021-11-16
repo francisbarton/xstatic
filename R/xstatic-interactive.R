@@ -1,3 +1,6 @@
+#' Xplore the Stat-Xplore API interactively
+#'
+#' @export
 xstatic_interactive <- function() {
 
   sx_pull_id <- function(slice, ...) {
@@ -18,6 +21,7 @@ xstatic_interactive <- function() {
 
     dwpstat::dwp_schema(id) %>%
       dplyr::filter(type == type) %>%
+      dplyr::slice_tail(n = 1) %>% # in case there's >1 VALUESET option
       dplyr::pull("id") %>%
       sx_pull_col(col = "id", .) %>%
       tail(tail) %>%
@@ -33,7 +37,7 @@ xstatic_interactive <- function() {
     dplyr::pull(label)
 
 
-  ben <- readline("Name of benefit to retrieve (partial match/regex OK) or enter 1 for a list of all available benefits: ")
+  ben <- readline("Name of benefit to retrieve\n(partial match/regex is OK)\nor enter 1 for a list of all available benefits: ")
   assertthat::is.string(ben)
   assertthat::assert_that(nchar(ben) < 50)
 
@@ -41,7 +45,7 @@ xstatic_interactive <- function() {
   if (ben == "1") {
     usethis::ui_line(bens_list)
 
-    ben <- readline("Name of benefit to retrieve (partial match/regex OK) or enter 1 for a list of all available benefits: ")
+    ben <- readline("Name of benefit to retrieve\n(partial match/regex is OK)\nor enter 1 for a list of all available benefits: ")
     assertthat::is.string(ben)
     assertthat::assert_that(nchar(ben) < 50)
   }
@@ -56,7 +60,7 @@ xstatic_interactive <- function() {
       usethis::ui_line(bens_list)
     }
 
-    ben <- readline("Name of benefit to retrieve (partial match/regex OK) or enter 1 for a list of all available benefits: ")
+    ben <- readline("Name of benefit to retrieve\n(partial match/regex is OK)\nor enter 1 for a list of all available benefits: ")
     assertthat::is.string(ben)
     assertthat::assert_that(nchar(ben) < 50)
 
@@ -113,7 +117,7 @@ xstatic_interactive <- function() {
   while (usethis::ui_nope("Happy to proceed? ", n_no = 1, shuffle = FALSE)) {
     measure <- readline("Please choose a measure: ")
     measure <- as.integer(measure)
-    assertthat::is.number(measure)
+    assertthat::is.count(measure)
     assertthat::assert_that(measure %in% seq(nrow(measure_options)))
 
     measure_id <- measure_options$id[measure]

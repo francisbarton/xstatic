@@ -30,7 +30,7 @@ process_aliases <- function(x) {
   }
 }
 
-extract_area_codes <- function(lookup, filter_level, filter_area, return_level, chatty = TRUE) {
+get_area_codes <- function(lookup, filter_level, filter_area, return_level, chatty = TRUE) {
 
   return_level <- paste0(process_aliases(return_level)[1], "cd")
 
@@ -68,20 +68,6 @@ extract_area_codes <- function(lookup, filter_level, filter_area, return_level, 
 
   # return
   area_codes
-}
-
-get_area_codes <- function(area_code_lookup = NULL, ...) {
-
-  if (is.null(area_code_lookup)) area_code_lookup <- drk_lookup
-
-  # fallback as internal sysdta seems not to be loading in properly
-  if (is.null(area_code_lookup)) {
-    area_code_lookup <- readr::read_csv("https://github.com/drkane/geo-lookups/raw/master/lsoa_la.csv") %>%
-      janitor::clean_names()
-  }
-
-  area_code_lookup %>%
-    extract_area_codes(...)
 }
 
 

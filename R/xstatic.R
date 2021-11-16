@@ -2,7 +2,7 @@
 #'
 #' @name xstatic
 #'
-#' @param x name of a benefit dataset on Stat-Xplore (partial/regex works)
+#' @param ben name of a benefit dataset on Stat-Xplore (partial/regex works)
 #' @param area_codes (optional) provide your own vector (list) of area codes for the query (don't use built-in lookup)
 #' @param filter_level return data within an area at this level
 #' @param filter_area return data within this area. defaults to ".*" (all)
@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' xstatic(
-#' x = "^Carers",
+#' ben = "^Carers",
 #' filter_level = "lad", # case-insensitive
 #' filter_area = "City of London", # case sensitive
 #' return_level = "MsOa", # case-insensitive
@@ -25,27 +25,29 @@
 #' periods_head = 1, # returns penultimate data period only (ie first 1 of 2)
 #' chatty = FALSE)
 
-xstatic <- function(x, area_codes = NULL, filter_level = NULL, filter_area = ".*", return_level, area_code_lookup = NULL, geo_level = NULL, chatty = TRUE, ...) {
+xstatic <- function(ben, area_codes = NULL, filter_level = NULL, filter_area = ".*", return_level, area_code_lookup = NULL, geo_level = NULL, chatty = TRUE, ...) {
 
   if (is.null(area_codes)) {
     if (chatty) {
       usethis::ui_info("No list of area codes provided. Using a lookup instead.")
     }
 
+    area_code_lookup <- drk_lookup
+
     area_codes <- get_area_codes(area_code_lookup, filter_level, filter_area, return_level, chatty)
   }
 
-    areas_list <- make_batched_list(area_codes, batch_size = 1000)
+  areas_list <- make_batched_list(area_codes, batch_size = 1000)
 
-    if (chatty) {
-      usethis::ui_info(paste(length(area_codes), "area codes retrieved and batched into a list of", length(areas_list), "batches"))
-    }
+  if (chatty) {
+    usethis::ui_info(paste(length(area_codes), "area codes retrieved and batched into a list of", length(areas_list), "batches"))
+  }
 
 
   data_level <- process_aliases(return_level)[1]
   geo_level <- geo_level %||% as.numeric(process_aliases(return_level)[2])
 
-  build_list <- get_dwp_codes(x, geo_level, chatty, ...)
+  build_list <- get_dwp_codes(ben, geo_level, chatty, ...)
 
   assertthat::assert_that(is.list(build_list))
   assertthat::assert_that(length(build_list) == 6)
@@ -89,7 +91,7 @@ xstatic <- function(x, area_codes = NULL, filter_level = NULL, filter_area = ".*
   # prepare area level codes and benefit name to be column names
   data_level_code <- paste0(data_level, "cd")
   data_level_name <- paste0(data_level, "nm")
-  tidy_ben_name <- snakecase::to_snake_case(x)
+  tidy_ben_name <- snakecase::to_snake_case(ben)
   # ui_info(paste("Data level code:", data_level_code))
   # ui_info(paste("Data level name:", data_level_name))
 

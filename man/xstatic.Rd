@@ -5,7 +5,7 @@
 \title{xstatic}
 \usage{
 xstatic(
-  x,
+  ben,
   area_codes = NULL,
   filter_level = NULL,
   filter_area = ".*",
@@ -17,7 +17,7 @@ xstatic(
 )
 }
 \arguments{
-\item{x}{name of a benefit dataset on Stat-Xplore (partial/regex works)}
+\item{ben}{name of a benefit dataset on Stat-Xplore (partial/regex works)}
 
 \item{area_codes}{(optional) provide your own vector (list) of area codes for the query (don't use built-in lookup)}
 
@@ -43,7 +43,7 @@ xstatic
 }
 \examples{
 xstatic(
-x = "^Carers",
+ben = "^Carers",
 filter_level = "lad", # case-insensitive
 filter_area = "City of London", # case sensitive
 return_level = "MsOa", # case-insensitive

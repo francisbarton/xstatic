@@ -62,7 +62,7 @@ get_dwp_codes <- function(
 
   if (is.null(measure)) {
     if (ben %in% universal_type) {
-      measure <- 2
+      measure <- ds
     } else if (ben %in% housing_type) {
       measure <- 4
     } else {
@@ -170,6 +170,7 @@ sx_get_periods <- function(id, type = "VALUESET", tail = 1, head = NULL) {
 
   dwpstat::dwp_schema(id) %>%
     dplyr::filter(type == type) %>%
+    dplyr::slice_tail(n = 1) %>%
     dplyr::pull(id) %>%
     sx_pull_col(col = "id") %>%
     tail(tail) %>%

@@ -24,8 +24,10 @@ Imports:
     readr,
     rlang,
     snakecase,
+    stats,
     stringr,
-    usethis
+    usethis,
+    utils
 Remotes:
     dr-uk/dwpstat
 Depends: 
