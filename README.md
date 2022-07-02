@@ -180,7 +180,7 @@ Please note that the xstatic project is released with a [Contributor Code of Con
 
 ### Contact me
 
-You can email francis.barton@citizensonline.org.uk or ping me on twitter [@ludictech](https://twitter.com/ludictech)
+You can email fbarton@alwaysdata.net or ping me on twitter [@ludictech](https://twitter.com/ludictech)
 
 Please [use](https://trinkerrstuff.wordpress.com/2013/08/31/github-package-ideas-i-stole/) issues on this repo to make suggestions or report problems or bugs.
 
